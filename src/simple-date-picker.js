@@ -1,5 +1,6 @@
-(function() {
+(function () {
   var datepicker = {};
+  var language = "default"
   window.datepicker = datepicker;
 
   /**
@@ -7,7 +8,7 @@
    * @param {Date} date 
    * @return {string} ret 
    */
-  datepicker.format = function(date) {
+  datepicker.format = function (date) {
     var ret = '';
     function padding(num) {
       if (num <= 9) {
@@ -16,7 +17,7 @@
         return num;
       }
     }
-    ret += date.getFullYear() + '-' + padding(date.getMonth()+1) + '-' + padding(date.getDate());
+    ret += date.getFullYear() + '-' + padding(date.getMonth() + 1) + '-' + padding(date.getDate());
     return ret;
   }
 
@@ -26,7 +27,7 @@
    * @param {number} month 
    * @return {Object} object
    */
-  datepicker.getMonthDate = function(year, month) {
+  datepicker.getMonthDate = function (year, month) {
     var ret = [];
     var today = new Date();
     var row;
@@ -35,7 +36,7 @@
 
     var firstDay = new Date(year, month - 1, 1);
     var firstDayWeekDay = firstDay.getDay();
-    firstDayWeekDay = firstDayWeekDay === 0? 7: firstDayWeekDay;
+    firstDayWeekDay = firstDayWeekDay === 0 ? 7 : firstDayWeekDay;
 
     var lastDayOfLastMonth = new Date(year, month - 1, 0);
     var lastDateOfLastMonth = lastDayOfLastMonth.getDate();
@@ -47,7 +48,7 @@
     year = firstDay.getFullYear();
     month = firstDay.getMonth() + 1;
 
-    row = firstDayWeekDay - 1 + lastDate > 28? (firstDayWeekDay - 1 + lastDate > 35? 6: 5): 4;
+    row = firstDayWeekDay - 1 + lastDate > 28 ? (firstDayWeekDay - 1 + lastDate > 35 ? 6 : 5) : 4;
 
     for (var i = 0; i < 7 * row; i++) {
       var date = i + 1 - prevMonthDayCount;
@@ -89,44 +90,68 @@
    * @param {number} month 
    * @return {string} html
    */
-  datepicker.createHTML = function($wrapper, year, month) {
+  datepicker.createHTML = function ($wrapper, year, month) {
     year = year || new Date().getFullYear();
-    month = month || new Date().getMonth()+1;
+    month = month || new Date().getMonth() + 1;
     if (month === 13) {
       year++;
       month = 1
     }
     $wrapper.monthDate = datepicker.getMonthDate(year, month);
+    console.log(language);
+    var html
+    if (language == "en") {
+      html = '<div class="ui-datepicker-header">' +
+        '<span class="ui-datepicker-btn ui-datepicker-prev-btn">&lt;</span>' +
+        '<span class="ui-datepicker-btn ui-datepicker-next-btn">&gt;</span>' +
+        '<span class="ui-datepicker-curr-month">' + $wrapper.monthDate.year + '-' + $wrapper.monthDate.month + '</span>' +
+        '</div>' +
+        '<div class="ui-datepicker-body">' +
+        '<table>' +
+        '<thead>' +
+        '<tr>' +
+        '<th>Mo</th>' +
+        '<th>Tu</th>' +
+        '<th>We</th>' +
+        '<th>Th</th>' +
+        '<th>Fr</th>' +
+        '<th>Sa</th>' +
+        '<th>Su</th>' +
+        '</tr>' +
+        '</thead>' +
+        '<tbody>';
+    } else {
+      html = '<div class="ui-datepicker-header">' +
+        '<span class="ui-datepicker-btn ui-datepicker-prev-btn">&lt;</span>' +
+        '<span class="ui-datepicker-btn ui-datepicker-next-btn">&gt;</span>' +
+        '<span class="ui-datepicker-curr-month">' + $wrapper.monthDate.year + '-' + $wrapper.monthDate.month + '</span>' +
+        '</div>' +
+        '<div class="ui-datepicker-body">' +
+        '<table>' +
+        '<thead>' +
+        '<tr>' +
+        '<th>一</th>' +
+        '<th>二</th>' +
+        '<th>三</th>' +
+        '<th>四</th>' +
+        '<th>五</th>' +
+        '<th>六</th>' +
+        '<th>日</th>' +
+        '</tr>' +
+        '</thead>' +
+        '<tbody>';
+    }
 
-    var html = '<div class="ui-datepicker-header">' + 
-                  '<span class="ui-datepicker-btn ui-datepicker-prev-btn">&lt;</span>' +
-                  '<span class="ui-datepicker-btn ui-datepicker-next-btn">&gt;</span>' +
-                  '<span class="ui-datepicker-curr-month">' + $wrapper.monthDate.year + '-' + $wrapper.monthDate.month  + '</span>' +
-                '</div>' + 
-                '<div class="ui-datepicker-body">' +
-                  '<table>' +
-                    '<thead>' +
-                      '<tr>' +
-                        '<th>一</th>' +
-                        '<th>二</th>' +
-                        '<th>三</th>' +
-                        '<th>四</th>' +
-                        '<th>五</th>' +
-                        '<th>六</th>' +
-                        '<th>日</th>' +
-                      '</tr>' +
-                    '</thead>' +
-                    '<tbody>';
 
     for (var i = 0; i < $wrapper.monthDate.days.length; i++) {
       var date = $wrapper.monthDate.days[i];
       if (i % 7 === 0) {
         html += '<tr>';
       }
-      
+
       if ($wrapper.monthDate.year === new Date().getFullYear() &&
-          $wrapper.monthDate.month === new Date().getMonth() + 1  &&
-          $wrapper.monthDate.days[i].showDate === new Date().getDate()) {
+        $wrapper.monthDate.month === new Date().getMonth() + 1 &&
+        $wrapper.monthDate.days[i].showDate === new Date().getDate()) {
         html += '<td class="today" data-date="' + date.date + '">' + date.showDate + '</td>';
       } else if (month === $wrapper.monthDate.days[i].month) {
         html += '<td data-date="' + date.date + '">' + date.showDate + '</td>';
@@ -140,9 +165,9 @@
     }
 
     html += '</tbody>' +
-        '</table>' +
+      '</table>' +
       '</div>';
-    
+
     return html;
   };
 
@@ -151,9 +176,9 @@
    * @param {Node} $wrapper
    * @param {string} direction 
    */
-  datepicker.render = function($wrapper, direction) {
-    var year = $wrapper.monthDate? $wrapper.monthDate.year: undefined;
-    var month = $wrapper.monthDate? $wrapper.monthDate.month: undefined;
+  datepicker.render = function ($wrapper, direction) {
+    var year = $wrapper.monthDate ? $wrapper.monthDate.year : undefined;
+    var month = $wrapper.monthDate ? $wrapper.monthDate.month : undefined;
     if (direction === 'prev') {
       month--;
       if (month === 0) {
@@ -171,15 +196,16 @@
    * 初始化日历 DOM，绑定 $input 点击事件
    * @param {DOMNode} $input
    */
-  datepicker.init = function($input) {
+  datepicker.init = function ($input, selectedLanguage = "default") {
     var isOpen = false;
     var $wrapper = document.createElement('div');
     $wrapper.className = 'ui-datepicker-wrapper';
+    language = selectedLanguage
 
     datepicker.render($wrapper);
 
     // $input 点击事件，显示日历 Node
-    $input.addEventListener('click', function() {
+    $input.addEventListener('click', function () {
       if (isOpen) {
         $wrapper.classList.remove('ui-datepicker-wrapper-show');
         isOpen = false;
@@ -195,10 +221,10 @@
     }, false);
 
     // 日历 Dode 点击事件，渲染日历日期
-    $wrapper.addEventListener('click', function(e) {
+    $wrapper.addEventListener('click', function (e) {
       var $target = e.target;
       if (!$target.classList.contains('ui-datepicker-btn')) {
-        return ;
+        return;
       }
       if ($target.classList.contains('ui-datepicker-prev-btn')) {
         datepicker.render($wrapper, 'prev');
@@ -208,9 +234,9 @@
     }, false);
 
     // 日历 Dode 点击事件，获取日期值给 $input.value
-    $wrapper.addEventListener('click', function(e) {
+    $wrapper.addEventListener('click', function (e) {
       var $target = e.target;
-      if ($target.tagName.toLowerCase() !== 'td' || $target.classList.contains('disabled')) return ;
+      if ($target.tagName.toLowerCase() !== 'td' || $target.classList.contains('disabled')) return;
 
       var date = new Date($wrapper.monthDate.year, $wrapper.monthDate.month - 1, $target.dataset.date);
 
